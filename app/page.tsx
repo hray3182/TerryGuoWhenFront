@@ -253,6 +253,8 @@ const RegisterUi: React.FC<{ sendMessage: SendMessage; result: string; }> = ({ s
     }
   }
 
+
+
   return (
     <div className="h-screen w-screen opacity-50% bg-gray-200 flex flex-col justify-center items-center">
       <h1 className="text-2xl font-bold text-center mt-10"
@@ -261,11 +263,17 @@ const RegisterUi: React.FC<{ sendMessage: SendMessage; result: string; }> = ({ s
         type="text" placeholder="輸入使用者名稱" ref={usernameRef} />
       <button className="border border-gray-400 p-2 mt-2  text-center rounded-md" onClick={register}>送出</button>
       <p className="text-red-500">{result}</p>
+
     </div>
   );
 }
 
 const UserInfoView = ({ user }: { user: User }) => {
+  const recreateUser = () => {
+    // clear local storage
+    localStorage.removeItem('user');
+    window.location.reload();
+  }
   return (
     <div className="w-full m-3 p-3 bg-slate-200 text-center space-y-3 rounded-md">
       <h1 className="text-2xl font-bold"
@@ -273,6 +281,9 @@ const UserInfoView = ({ user }: { user: User }) => {
       <p>使用者名稱: {user.username}</p>
       <p>餘額: {user.balance}</p>
       <p>創建時間: {user.create_time}</p>
+      <button className="border border-gray-400 p-2 mt-2  text-center rounded-md" onClick={recreateUser}>重新登入</button>
+      <p className="text-red-500"
+      >重建使用者將無法再次登入原使用者</p>
     </div>
   );
 }
@@ -381,10 +392,11 @@ const CurrentBettingView = ({ bettings }: { bettings: betting[] }) => {
 }
 
 const EarnInfoView = ({ earnInfos }: { earnInfos: earnInfo[] }) => {
+  // game id 2024-06-20-1
   // game id 2024-06-20-432
   // 降序排列
   earnInfos = earnInfos.sort((a, b) => {
-    return b.game_id.localeCompare(a.game_id);
+    return Number(b.game_id.split('-')[3]) - Number(a.game_id.split('-')[3]);
   })
   return (
     <div className="m-3 p-3 bg-slate-200 text-center space-y-3 rounded-md max-h-[50vh] overflow-y-auto p-5">
