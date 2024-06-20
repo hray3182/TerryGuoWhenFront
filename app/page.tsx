@@ -5,7 +5,7 @@ import useWebSocket, { SendMessage } from 'react-use-websocket';
 import { Game} from './module/game';
 // global.css
 import './globals.css';
-const socketUrl = 'ws://localhost:8888/ws';
+const socketUrl = 'ws://trerryguowhenapi.zeabur.app/ws';
 
 interface Response {
   action: string;
