@@ -109,7 +109,10 @@ export default function Home() {
     sendMessage(JSON.stringify(request));
   }
 
-
+  const playSound = () => {
+    const audio = new Audio('/winning.wav');
+    audio.play();
+  }
 
   useEffect(() => {
     if (lastMessage !== null) {
@@ -179,6 +182,11 @@ export default function Home() {
           // @ts-ignore
           earn_amount: response.data.earn_amount
         }]);
+        // @ts-ignore
+        if (response.data.earn_amount > response.data.bet_amount) {
+          playSound();
+        }
+
       }
 
       if (response.action === 'get_earn_records' && response.status === 'success') {
@@ -274,13 +282,20 @@ const UserInfoView = ({ user }: { user: User }) => {
     localStorage.removeItem('user');
     window.location.reload();
   }
+  // string to date and add 8 hours 2024-06-20 13:26:17
+  // parse to date
+  let date = Date.parse(user.create_time);
+  // add 8 hours
+  date = date + 8 * 60 * 60 * 1000;
+
   return (
     <div className="w-full m-3 p-3 bg-slate-200 text-center space-y-3 rounded-md">
       <h1 className="text-2xl font-bold"
       >使用者資訊</h1>
       <p>使用者名稱: {user.username}</p>
       <p>餘額: {user.balance}</p>
-      <p>創建時間: {user.create_time}</p>
+      {/* add 8 h */}
+      <p>創建時間: {new Date(date).toLocaleString()}</p>
       <button className="border border-gray-400 p-2 mt-2  text-center rounded-md" onClick={recreateUser}>重新起號</button>
       <p className="text-red-500"
       >重建使用者將無法再次登入原使用者</p>
@@ -312,6 +327,7 @@ interface BettingViewProps {
 const BettingView = ({ sendMessage, gameState, result, restTime }: BettingViewProps) => {
   const [bet, setBet] = useState<number[]>([]);
   const amountRef = useRef<HTMLInputElement>(null);
+  const randomBetCount = useRef<number>(0);
   const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
   const selectNum = (num: number) => {
@@ -331,6 +347,7 @@ const BettingView = ({ sendMessage, gameState, result, restTime }: BettingViewPr
   }
 
   const betting = () => {
+
     // amount 不得小於0
     if (Number(amountRef.current?.value) <= 0) {
       return;
@@ -342,6 +359,7 @@ const BettingView = ({ sendMessage, gameState, result, restTime }: BettingViewPr
     sendMessage(JSON.stringify(request));
     console.log(request);
   }
+
 
   return (
     <div className="w-full m-3 p-3 bg-slate-200 text-center space-y-3 rounded-md">
@@ -386,6 +404,7 @@ const CurrentBettingView = ({ bettings }: { bettings: betting[] }) => {
             <p>下注金額: {bet.amount}</p>
           </div>
         );
+        
       })}
     </div>
   );
@@ -436,18 +455,30 @@ const EarnInfoView = ({ earnInfos }: { earnInfos: earnInfo[] }) => {
 }
 
 const TopUserView = ({ topUsers }: { topUsers: topUser[] }) => {
+  // 將數字轉換成中文單位
+  // 萬、億、兆、京、垓、秭、穰、溝、澗、正、載
+  const numToChinese = (num: number) => {
+    const units = ['','萬', '億', '兆', '京', '垓', '秭', '穰', '溝', '澗', '正', '載'];
+    let unit = 0;
+    while (num > 10000) {
+      num = num / 10000;
+      unit++;
+    }
+    return num.toFixed(2) + units[unit];
+  }
   return (
     //use table
     <div className="m-3 w-full p-3 bg-slate-200 text-center space-y-3 rounded-md overflow-y-auto flex-grow h-[60vh]">
       <h1 className="text-2xl font-bold"
       >排行榜</h1>
-      <div className="flex w-full justify-center">
-        <div className='overflow-x-auto w-full m-auto '>
+      <div className="flex w-full">
+        <div className='overflow-x-auto w-full '>
           <table className='table-auto w-full'>
             <thead>
               <tr>
                 <th>排名</th>
-                <th>使用者名稱</th>
+                <th className="w-1/2"
+                >使用者名稱</th>
                 <th>餘額</th>
               </tr>
             </thead>
@@ -457,7 +488,7 @@ const TopUserView = ({ topUsers }: { topUsers: topUser[] }) => {
                   <tr key={index}>
                     <td>{index + 1}</td>
                     <td>{user.username}</td>
-                    <td>{user.balance}</td>
+                    <td>{numToChinese(user.balance)}</td>
                   </tr>
                 );
               })}
