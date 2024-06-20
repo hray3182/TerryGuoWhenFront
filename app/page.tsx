@@ -320,6 +320,10 @@ const BettingView = ({ sendMessage, gameState, result, restTime }: BettingViewPr
   }
 
   const betting = () => {
+    // amount 不得小於0
+    if (Number(amountRef.current?.value) <= 0) {
+      return;
+    }
     const request: Request = {
       action: 'bet',
       data: JSON.stringify({ "nums": bet, "amount": Number(amountRef.current?.value) })
