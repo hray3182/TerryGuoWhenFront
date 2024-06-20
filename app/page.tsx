@@ -281,7 +281,7 @@ const UserInfoView = ({ user }: { user: User }) => {
       <p>使用者名稱: {user.username}</p>
       <p>餘額: {user.balance}</p>
       <p>創建時間: {user.create_time}</p>
-      <button className="border border-gray-400 p-2 mt-2  text-center rounded-md" onClick={recreateUser}>重新登入</button>
+      <button className="border border-gray-400 p-2 mt-2  text-center rounded-md" onClick={recreateUser}>重新起號</button>
       <p className="text-red-500"
       >重建使用者將無法再次登入原使用者</p>
     </div>
@@ -438,7 +438,7 @@ const EarnInfoView = ({ earnInfos }: { earnInfos: earnInfo[] }) => {
 const TopUserView = ({ topUsers }: { topUsers: topUser[] }) => {
   return (
     //use table
-    <div className="m-3 w-full p-3 bg-slate-200 text-center space-y-3 rounded-md overflow-y-auto flex-grow ">
+    <div className="m-3 w-full p-3 bg-slate-200 text-center space-y-3 rounded-md overflow-y-auto flex-grow h-[60vh]">
       <h1 className="text-2xl font-bold"
       >排行榜</h1>
       <div className="flex w-full justify-center">
