@@ -46,7 +46,17 @@ interface gameHistory {
   game_nums: number[];
 }
 
-
+  // 將數字轉換成中文單位
+  // 萬、億、兆、京、垓、秭、穰、溝、澗、正、載
+  const numToChinese = (num: number) => {
+    const units = ['','萬', '億', '兆', '京', '垓', '秭', '穰', '溝', '澗', '正', '載'];
+    let unit = 0;
+    while (num > 10000) {
+      num = num / 10000;
+      unit++;
+    }
+    return num.toFixed(2) + units[unit];
+  }
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
@@ -293,7 +303,7 @@ const UserInfoView = ({ user }: { user: User }) => {
       <h1 className="text-2xl font-bold"
       >使用者資訊</h1>
       <p>使用者名稱: {user.username}</p>
-      <p>餘額: {user.balance}</p>
+      <p>餘額: {numToChinese(user.balance)}</p>
       {/* add 8 h */}
       <p>創建時間: {new Date(date).toLocaleString()}</p>
       <button className="border border-gray-400 p-2 mt-2  text-center rounded-md" onClick={recreateUser}>重新起號</button>
@@ -401,7 +411,7 @@ const CurrentBettingView = ({ bettings }: { bettings: betting[] }) => {
         return (
           <div key={index} className="flex justify-between">
             <p>下注號碼: {bet.nums.join(' ')}</p>
-            <p>下注金額: {bet.amount}</p>
+            <p>下注金額: {numToChinese(bet.amount)}</p>
           </div>
         );
         
@@ -441,8 +451,8 @@ const EarnInfoView = ({ earnInfos }: { earnInfos: earnInfo[] }) => {
                     <td>{info.game_id}</td>
                     <td>{info.game_nums}</td>
                     <td>{info.user_nums}</td>
-                    <td>{info.bet_amount}</td>
-                    <td>{info.earn_amount}</td>
+                    <td>{numToChinese(info.bet_amount)}</td>
+                    <td>{numToChinese(info.earn_amount)}</td>
                   </tr>
                 );
               })}
@@ -455,17 +465,7 @@ const EarnInfoView = ({ earnInfos }: { earnInfos: earnInfo[] }) => {
 }
 
 const TopUserView = ({ topUsers }: { topUsers: topUser[] }) => {
-  // 將數字轉換成中文單位
-  // 萬、億、兆、京、垓、秭、穰、溝、澗、正、載
-  const numToChinese = (num: number) => {
-    const units = ['','萬', '億', '兆', '京', '垓', '秭', '穰', '溝', '澗', '正', '載'];
-    let unit = 0;
-    while (num > 10000) {
-      num = num / 10000;
-      unit++;
-    }
-    return num.toFixed(2) + units[unit];
-  }
+
   return (
     //use table
     <div className="m-3 w-full p-3 bg-slate-200 text-center space-y-3 rounded-md overflow-y-auto flex-grow h-[60vh]">
