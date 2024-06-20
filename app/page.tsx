@@ -323,6 +323,7 @@ const GameView = ({ game }: { game: Game }) => {
     <div className="w-full m-3 p-3 bg-slate-200 text-center space-y-3 rounded-md">
       <h1 className="text-2xl font-bold"
       >遊戲資訊</h1>
+      <p>中1賠1 中2賠3 中3賠50 </p>
       <p>遊戲編號: {game.game_id}</p>
       <p>遊戲狀態: {stateMap[game.game_state]}</p>
     </div>
