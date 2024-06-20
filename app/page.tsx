@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { User } from './module/user';
 import useWebSocket, { SendMessage } from 'react-use-websocket';
-import { Game} from './module/game';
+import { Game } from './module/game';
 // global.css
 import './globals.css';
 const socketUrl = 'wss://trerryguowhenapi.zeabur.app/ws';
@@ -59,6 +59,7 @@ export default function Home() {
   const [earnInfos, setEarnInfos] = useState<earnInfo[]>([])
   const [topUsers, setTopUsers] = useState<topUser[]>([])
   const [gameHistory, setGameHistory] = useState<gameHistory[]>([])
+  const [restTime, setRestTime] = useState(0)
 
 
   const login = () => {
@@ -149,9 +150,11 @@ export default function Home() {
         // @ts-ignore
         if (currentGame && currentGame.game_id !== response.data.game_id) {
           setCurrentBettings([]);
+          setRestTime(8);
         }
         // @ts-ignore
         setCurrentGame(response.data);
+
       }
       if (response.action === 'bet') {
         if (response.status === 'fail') {
@@ -168,9 +171,9 @@ export default function Home() {
           // @ts-ignore
           game_id: response.data.game_id,
           // @ts-ignore
-          game_nums: "["+response.data.game_nums.join(', ')+ "]",
+          game_nums: "[" + response.data.game_nums.join(', ') + "]",
           // @ts-ignore
-          user_nums: "["+response.data.user_nums.join(', ')+"]",
+          user_nums: "[" + response.data.user_nums.join(', ') + "]",
           // @ts-ignore
           bet_amount: response.data.bet_amount,
           // @ts-ignore
@@ -200,6 +203,16 @@ export default function Home() {
     getHistory()
   }, []);
 
+  useEffect(() => {
+    if (restTime > 0) {
+      const timerId = setInterval(() => {
+        setRestTime((prevTime) => prevTime - 1);
+      }, 1000); // 每秒减少1
+
+      return () => clearInterval(timerId);
+    }
+  }, [restTime]);
+
 
 
   return (
@@ -213,7 +226,7 @@ export default function Home() {
         </div>
         <div className="w-1/3 h-screen">
           {(logined && currentGame) && <GameView game={currentGame} />}
-          {(logined && currentGame) && <BettingView sendMessage={sendMessage} gameState={currentGame.game_state} result={bettingResult} />}
+          {(logined && currentGame) && <BettingView sendMessage={sendMessage} gameState={currentGame.game_state} result={bettingResult} restTime={restTime} />}
           {(logined && currentBettings) && <CurrentBettingView bettings={currentBettings} />}
         </div>
         <div className="w-1/3 h-screen">
@@ -283,8 +296,9 @@ interface BettingViewProps {
   sendMessage: SendMessage;
   gameState: string;
   result: betResult | null;
+  restTime: number;
 }
-const BettingView = ({ sendMessage, gameState, result }: BettingViewProps) => {
+const BettingView = ({ sendMessage, gameState, result, restTime }: BettingViewProps) => {
   const [bet, setBet] = useState<number[]>([]);
   const amountRef = useRef<HTMLInputElement>(null);
   const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -318,7 +332,7 @@ const BettingView = ({ sendMessage, gameState, result }: BettingViewProps) => {
     <div className="w-full m-3 p-3 bg-slate-200 text-center space-y-3 rounded-md">
 
       <h1 className="text-2xl font-bold"
-      >下注</h1>
+      >{"下注: " + String(restTime)}</h1>
       <p>選擇三個號碼下注</p>
       <div className="flex justify-center space-x-3">
         <input className={"border border-gray-400 p-2 mt-2 w-1/2 text-center rounded-md "} ref={amountRef} defaultValue={100}
